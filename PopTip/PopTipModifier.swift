@@ -18,6 +18,9 @@ struct PopTipStyle {
   var margin: CGFloat = 20
   var cornerRadius: CGFloat = 10
   var maxWidth: CGFloat = 200
+  var shadowColor: Color = .gray
+  var shadowRadius: CGFloat = 2
+  var shadowOffset: CGVector = .init(dx: 1, dy: 1)
 }
 
 extension PopTipStyle {
@@ -25,9 +28,12 @@ extension PopTipStyle {
   static let error = PopTipStyle(
     foregroundColor: Color(.systemBackground),
     backgroundColor: Color(.systemRed),
-    margin: 20,
+    margin: 15,
     cornerRadius: 4,
-    maxWidth: 250
+    maxWidth: 250,
+    shadowColor: .red,
+    shadowRadius:  4,
+    shadowOffset: .init(dx: 1, dy: 1)
   )
 }
 
@@ -70,7 +76,7 @@ struct PopTipModifier<Label: View>: ViewModifier {
             path.closeSubpath()
           }
           .foregroundColor(style.backgroundColor)
-          .shadow(color: Color.gray, radius: 2, x: 1, y: 1)
+          .shadow(color: style.shadowColor, radius: style.shadowRadius, x: style.shadowOffset.dx, y: style.shadowOffset.dy)
           label()
             .foregroundColor(style.foregroundColor)
             .measureFrame(
@@ -79,8 +85,8 @@ struct PopTipModifier<Label: View>: ViewModifier {
             )
             .frame(maxWidth: style.maxWidth)
         }
-        .offset(.init(width: 0, height: -0.5 * (popTipFrame.height + contentFrame.height + Constant.triangleHieght*2)))
-        .frame(width: popTipFrame.width, height: popTipFrame.height)
+        .offset(.init(width: 0, height: -0.5 * (popTipFrame.height + contentFrame.height) - Constant.triangleHieght - style.shadowRadius))
+        .frame(width: popTipFrame.width, height: popTipFrame.height + Constant.triangleHieght + style.shadowRadius)
         .scaleEffect(.init(width: scale, height: scale), anchor: .center)
       )
       .onPreferenceChange(PopTipSizePreferenceKey.self) { key in
